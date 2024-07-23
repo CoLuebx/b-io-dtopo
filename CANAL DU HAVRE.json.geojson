@@ -1,0 +1,10 @@
+{
+"type": "FeatureCollection",
+"name": "CANAL DU HAVRE",
+"crs": { "type": "name", "properties": { "name": "urn:ogc:def:crs:OGC::CRS84" } },
+"xy_coordinate_resolution": 1e-15,
+"features": [
+{ "type": "Feature", "properties": { "gid": 24565, "CdEntiteHy": "N20-0300", "NomEntiteH": "l'Auzance", "Candidat": null, "Classe": 1, "layer": "CANAL DU HAVRE", "path": "C:/Users/En Plein Milieu.x/Desktop/MAP/_travail/CE/CANAL DU HAVRE.shp" }, "geometry": { "type": "MultiLineString", "coordinates": [ [ [ -1.821974929803288, 46.592225047922447 ], [ -1.821974929803289, 46.592225047922447 ] ] ] } },
+{ "type": "Feature", "properties": { "gid": 41960, "CdEntiteHy": "N2044000", "NomEntiteH": "la Vertonne", "Candidat": null, "Classe": 3, "layer": "CANAL DU HAVRE", "path": "C:/Users/En Plein Milieu.x/Desktop/MAP/_travail/CE/CANAL DU HAVRE.shp" }, "geometry": { "type": "MultiLineString", "coordinates": [ [ [ -1.820825716239181, 46.591233342542033 ], [ -1.820825716239176, 46.591233342542047 ] ] ] } }
+]
+}
