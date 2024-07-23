@@ -1,0 +1,9 @@
+{
+"type": "FeatureCollection",
+"name": "RAU DE KERDU",
+"crs": { "type": "name", "properties": { "name": "urn:ogc:def:crs:OGC::CRS84" } },
+"xy_coordinate_resolution": 1e-15,
+"features": [
+{ "type": "Feature", "properties": { "gid": 4384, "CdEntiteHy": "J2314010", "NomEntiteH": "le Roscoat", "Candidat": null, "Classe": 2, "layer": "RAU DE KERDU", "path": "C:/Users/En Plein Milieu.x/Desktop/MAP/_travail/CE/RAU DE KERDU.shp" }, "geometry": { "type": "MultiLineString", "coordinates": [ [ [ -3.573295193908804, 48.674720623531037 ], [ -3.573295193908821, 48.674720623531044 ] ] ] } }
+]
+}
