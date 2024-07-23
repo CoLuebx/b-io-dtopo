@@ -10,23 +10,21 @@ L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
 }).addTo(map);
 
 // Variables pour stocker les couches de polygones et de cours d'eau
-var geojsonLayer, riversLayer, departmentsLayer;
-var riversVisible = true;
+var geojsonLayer, departmentsLayer, riversLayer;
 
 // Fonction pour chaque polygone
 function onEachFeature(feature, layer) {
     layer.on('click', function(e) {
-        if (!layer.isDarkened) {
-            // Rendre le polygone plus foncé lors du clic
-            layer.setStyle({
-                fillColor: darkenColor(layer.options.fillColor),
-                fillOpacity: 0.9
-            });
-            layer.isDarkened = true; // Marquer le polygone comme assombri
-        }
+        // Rendre le polygone entièrement noir lors du clic
+        layer.setStyle({
+            fillColor: '#000000',
+            fillOpacity: 1,
+            color: '#000000',
+            weight: 2
+        });
 
         // Formater le texte du popup
-        var layerText = capitalizeWords(feature.properties.layer || feature.properties.nom);
+        var layerText = capitalizeWords(feature.properties.layer);
 
         // Afficher le popup avec l'attribut "layer" ou "nom"
         layer.bindPopup(layerText).openPopup();
@@ -48,6 +46,78 @@ function onEachFeature(feature, layer) {
                 }
             });
         }
+
+        // Extraire l'attribut "layer" du polygone cliqué
+        var layerValue = feature.properties.layer;
+        var filename = layerValue + ".json.geojson";
+
+        // Afficher les cours d'eau correspondants
+        if (riversLayer) {
+            map.removeLayer(riversLayer);
+        }
+        fetch(filename)
+            .then(response => response.json())
+            .then(data => {
+                riversLayer = L.geoJSON(data, {
+                    style: riverStyleWhite, // Utiliser un style différent pour les cours d'eau
+                    onEachFeature: onEachRiverFeature
+                }).addTo(map);
+            })
+            .catch(err => console.error(err));
+    });
+}
+
+// Fonction pour styliser les cours d'eau en blanc
+function riverStyleWhite(feature) {
+    return {
+        color: '#ffffff', // Blanc pour les cours d'eau
+        weight: 0.5, // Épaisseur par défaut
+        opacity: 1
+    };
+}
+
+// Fonction pour chaque cours d'eau
+function onEachRiverFeature(feature, layer) {
+    layer.on('click', function(e) {
+        // Mettre en surbrillance le cours d'eau sélectionné en rouge et doubler son épaisseur
+        layer.setStyle({
+            color: '#ff0000', // Rouge pour la sélection
+            weight: layer.options.weight * 2
+        });
+
+        // Afficher le popup avec le nom du cours d'eau
+        var nameText = feature.properties.NomEntiteH;
+        console.log(nameText);
+        
+        // Lier le popup au layer
+        layer.bindPopup(nameText);
+
+        // Ouvrir le popup avec un léger délai
+        setTimeout(function() {
+            layer.openPopup();
+        }, 100);
+        
+
+        // Réinitialiser le style des autres cours d'eau
+        if (riversLayer) {
+            riversLayer.eachLayer(function(l) {
+                if (l != layer) {
+                    l.setStyle(riverStyleWhite(l.feature));
+                    l.closePopup(); // Fermer les autres popups
+                }
+            });
+        }
+    });
+
+    // Ajouter une couche supplémentaire pour augmenter la zone cliquable
+    var clickLayer = L.polyline(layer.getLatLngs(), {
+        color: 'transparent',
+        weight: layer.options.weight * 5, // Augmenter davantage la zone cliquable
+        pane: 'shadowPane'
+    }).addTo(map);
+
+    clickLayer.on('click', function() {
+        layer.fire('click'); // Déclencher l'événement de clic sur la couche principale
     });
 }
 
@@ -76,87 +146,21 @@ function darkenColor(color) {
     return `#${r.toString(16).padStart(2, '0')}${g.toString(16).padStart(2, '0')}${b.toString(16).padStart(2, '0')}`;
 }
 
-// Fonction pour styliser les bassins versants
+// Fonction pour styliser les bassins versants et les départements
 function style(feature) {
     return {
         fillColor: '#ffffff', // Blanc avec opacité
-        weight: 2, // Épaisseur des contours
+        weight: 1, // Épaisseur des contours
         opacity: 1,
         color: '#000000', // Couleur des contours
         dashArray: null,
         fillOpacity: 0.7 // Opacité à 70%
     };
-}
-
-// Fonction pour styliser les départements
-function departmentStyle(feature) {
-    return {
-        fillColor: '#ffffff', // Blanc avec opacité
-        weight: 2, // Épaisseur des contours
-        opacity: 1,
-        color: '#000000', // Couleur des contours
-        dashArray: null,
-        fillOpacity: 0.7 // Opacité à 70%
-    };
-}
-
-// Fonction pour styliser les cours d'eau en fonction de la classe
-function riverStyle(feature) {
-    var weight;
-    if (feature.properties.classe == 1) {
-        weight = 5; // Classe 1, épaisseur de 5
-    } else if (feature.properties.classe == 2) {
-        weight = 3; // Classe 2, épaisseur de 3
-    } else if (feature.properties.classe == 3) {
-        weight = 1; // Classe 3, épaisseur de 1
-    } else if (feature.properties.classe == 4) {
-        weight = 0.5; // Classe 4, épaisseur de 0.5
-    } else {
-        weight = 1; // Valeur par défaut
-    }
-
-    return {
-        color: generateColor(feature.properties.layer), // Utiliser la même couleur que les polygones
-        weight: weight,
-        opacity: 1
-    };
-}
-
-// Fonction pour chaque cours d'eau
-function onEachRiver(feature, layer) {
-    layer.on('click', function(e) {
-        // Rendre le cours d'eau rouge lorsqu'il est cliqué
-        layer.setStyle({
-            color: '#ff0000'
-        });
-
-        // Afficher le popup avec le nom du cours d'eau
-        var nameText = feature.properties.NomEntiteH;
-        layer.bindPopup(nameText).openPopup();
-
-        // Réinitialiser le style des autres cours d'eau
-        riversLayer.eachLayer(function(l) {
-            if (l != layer) {
-                l.setStyle(riverStyle(l.feature));
-            }
-        });
-    });
-
-    // Ajouter une couche supplémentaire pour augmenter la zone cliquable
-    var clickLayer = L.polyline(layer.getLatLngs(), {
-        color: 'transparent',
-        weight: layer.options.weight * 3, // Augmenter la zone cliquable
-        pane: 'clickable'
-    }).addTo(map);
-
-    clickLayer.on('click', function() {
-        layer.fire('click'); // Déclencher l'événement de clic sur la couche principale
-    });
 }
 
 // Fonction pour capitaliser la première lettre de chaque mot
 function capitalizeWords(str) {
-    return str.replace(/\b\w/g, function (txt) {
+    return str.replace(/\b\w/g, function(txt) {
         return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();
     });
 }
@@ -167,22 +171,16 @@ geojsonLayer = new L.GeoJSON.AJAX("bassins_versants.geojson", {
     style: style
 }).addTo(map); // Ajouter les bassins versants par défaut
 
-// Chargement du fichier GeoJSON pour les cours d'eau
-riversLayer = new L.GeoJSON.AJAX("cours_eau.geojson", {
-    onEachFeature: onEachRiver,
-    style: riverStyle
-}).addTo(map); // Ajouter les cours d'eau par défaut
-
 // Chargement du fichier GeoJSON avec style pour les départements
 departmentsLayer = new L.GeoJSON.AJAX("departements.geojson", {
     onEachFeature: onEachFeature,
-    style: departmentStyle
+    style: style
 });
 
 // Variable pour stocker le marqueur de la ville
 var cityMarker = null;
 
-// Fonction pour rechercher la ville et mettre en surbrillance le polygone correspondant
+// Fonction pour rechercher la ville et ajouter un marqueur
 function searchCity() {
     var city = document.getElementById('address-input').value;
     var url = 'https://nominatim.openstreetmap.org/search?format=json&limit=1&countrycodes=fr&city=' + city;
@@ -202,12 +200,6 @@ function searchCity() {
                 // Ajouter un nouveau marqueur pour la ville
                 cityMarker = L.marker([lat, lon]).addTo(map);
                 cityMarker.bindPopup(data[0].display_name.split(",")[0], {closeButton: false}).openPopup();
-
-                // Simuler un clic à l'emplacement de la ville trouvée
-                simulateClick(lat, lon);
-
-                // Centrer la carte sur la ville trouvée
-                map.setView([lat, lon], 12);
             } else {
                 alert('Ville non trouvée');
             }
@@ -215,23 +207,13 @@ function searchCity() {
         .catch(err => console.error(err));
 }
 
-// Fonction pour simuler un clic à une position spécifique
-function simulateClick(lat, lon) {
-    var point = map.latLngToContainerPoint([lat, lon]);
-    var event = new MouseEvent('click', {
-        bubbles: true,
-        cancelable: true,
-        clientX: point.x,
-        clientY: point.y
-    });
-    map.getContainer().dispatchEvent(event);
-}
-
-// Fonction pour basculer entre les bassins versants (avec cours d'eau) et les départements
+// Fonction pour basculer entre les bassins versants et les départements
 function switchLayer() {
-    if (map.hasLayer(geojsonLayer) || map.hasLayer(riversLayer)) {
+    if (map.hasLayer(geojsonLayer)) {
         map.removeLayer(geojsonLayer);
-        map.removeLayer(riversLayer);
+        if (riversLayer) {
+            map.removeLayer(riversLayer);
+        }
         if (!map.hasLayer(departmentsLayer)) {
             map.addLayer(departmentsLayer);
         }
@@ -240,17 +222,14 @@ function switchLayer() {
         if (!map.hasLayer(geojsonLayer)) {
             map.addLayer(geojsonLayer);
         }
-        if (!map.hasLayer(riversLayer)) {
-            map.addLayer(riversLayer);
-        }
     }
 }
 
-// Fonction pour afficher/masquer les cours d'eau
-function toggleRivers() {
-    if (map.hasLayer(riversLayer)) {
-        map.removeLayer(riversLayer);
-    } else {
-        map.addLayer(riversLayer);
+// Fonction pour masquer le popup lorsque l'on clique ailleurs sur la carte
+map.on('click', function() {
+    if (riversLayer) {
+        riversLayer.eachLayer(function(layer) {
+            layer.closePopup();
+        });
     }
-}
+});
