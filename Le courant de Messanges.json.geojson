@@ -1,0 +1,9 @@
+{
+"type": "FeatureCollection",
+"name": "Le courant de Messanges",
+"crs": { "type": "name", "properties": { "name": "urn:ogc:def:crs:OGC::CRS84" } },
+"xy_coordinate_resolution": 1e-15,
+"features": [
+{ "type": "Feature", "properties": { "gid": 12113, "CdEntiteHy": "S42-0400", "NomEntiteH": "Courant de Soustons", "Candidat": null, "Classe": 1, "layer": "Le courant de Messanges", "path": "C:/Users/En Plein Milieu.x/Desktop/MAP/_travail/CE/Le courant de Messanges.shp" }, "geometry": { "type": "MultiLineString", "coordinates": [ [ [ -1.405470244515296, 43.782002975711109 ], [ -1.405470244515302, 43.782002975711116 ], [ -1.405470244515302, 43.782002975711116 ] ] ] } }
+]
+}

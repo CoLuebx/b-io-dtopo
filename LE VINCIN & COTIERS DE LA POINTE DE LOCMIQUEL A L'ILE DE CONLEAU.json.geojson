@@ -1,0 +1,9 @@
+{
+"type": "FeatureCollection",
+"name": "LE VINCIN & COTIERS DE LA POINTE DE LOCMIQUEL A L'ILE DE CONLEAU",
+"crs": { "type": "name", "properties": { "name": "urn:ogc:def:crs:OGC::CRS84" } },
+"xy_coordinate_resolution": 1e-15,
+"features": [
+{ "type": "Feature", "properties": { "gid": 53967, "CdEntiteHy": "J6406500", "NomEntiteH": "le Bilair", "Candidat": null, "Classe": 4, "layer": "LE VINCIN & COTIERS DE LA POINTE DE LOCMIQUEL A L'ILE DE CONLEAU", "path": "C:/Users/En Plein Milieu.x/Desktop/MAP/_travail/CE/LE VINCIN & COTIERS DE LA POINTE DE LOCMIQUEL A L'ILE DE CONLEAU.shp" }, "geometry": { "type": "MultiLineString", "coordinates": [ [ [ -2.777604677148916, 47.626361777968789 ], [ -2.777604677148937, 47.626361777968789 ] ] ] } }
+]
+}
