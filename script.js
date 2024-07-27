@@ -56,7 +56,7 @@ function darkenColor(color) {
     return `#${r.toString(16).padStart(2, '0')}${g.toString(16).padStart(2, '0')}${b.toString(16).padStart(2, '0')}`;
 }
 
-// Fonction pour chaque polygone
+// Fonction pour chaque polygone (bassins versants)
 function onEachFeature(feature, layer) {
     layer.on('click', function(e) {
         layer.setStyle({
@@ -88,6 +88,24 @@ function onEachFeature(feature, layer) {
                 }).addTo(map);
             })
             .catch(err => console.error(err));
+    });
+}
+
+// Fonction pour chaque département
+function onEachDepartmentFeature(feature, layer) {
+    layer.on('click', function(e) {
+        layer.setStyle({
+            fillColor: '#000000',
+            fillOpacity: 1,
+            color: '#000000',
+            weight: 2
+        });
+
+        var departmentText = capitalizeWords(feature.properties.nom);
+        layer.bindPopup(departmentText).openPopup();
+
+        resetOtherLayers(departmentsLayer, layer);
+        resetOtherLayers(geojsonLayer, layer);
     });
 }
 
@@ -146,7 +164,7 @@ geojsonLayer = new L.GeoJSON.AJAX("bassins_versants.geojson", {
 
 // Chargement du fichier GeoJSON avec style pour les départements
 departmentsLayer = new L.GeoJSON.AJAX("departements.geojson", {
-    onEachFeature: onEachFeature,
+    onEachFeature: onEachDepartmentFeature,
     style: style
 });
 
@@ -170,7 +188,7 @@ function searchCity() {
                 }
 
                 cityMarker = L.marker([lat, lon]).addTo(map);
-                cityMarker.bindPopup(data[0].display_name.split(",")[0], {closeButton: false}).openPopup();
+                cityMarker.bindPopup(data[0].display_name.split(",")[0], { closeButton: false }).openPopup();
             } else {
                 alert('Ville non trouvée');
             }
@@ -193,10 +211,24 @@ function switchLayer() {
 }
 
 // Fonction pour masquer le popup lorsque l'on clique ailleurs sur la carte
-map.on('click', function() {
+map.on('click', function () {
     if (riversLayer) {
-        riversLayer.eachLayer(function(layer) {
+        riversLayer.eachLayer(function (layer) {
             layer.closePopup();
+        });
+    }
+
+    if (departmentsLayer) {
+        departmentsLayer.eachLayer(function (layer) {
+            layer.closePopup();
+            departmentsLayer.resetStyle(layer);
+        });
+    }
+
+    if (geojsonLayer) {
+        geojsonLayer.eachLayer(function (layer) {
+            layer.closePopup();
+            geojsonLayer.resetStyle(layer);
         });
     }
 });
