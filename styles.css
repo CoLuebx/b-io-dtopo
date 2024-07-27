@@ -47,7 +47,7 @@ body {
 
 #layer-switch {
     position: absolute;
-    top: 60px; /* Ajusté pour éviter la superposition avec la barre de recherche */
+    top: 60px;
     left: 50%;
     transform: translateX(-50%);
     z-index: 1000;
@@ -64,5 +64,5 @@ body {
 }
 
 .leaflet-popup {
-    z-index: 10000; /* Un z-index élevé pour s'assurer que le popup est au-dessus de tout */
+    z-index: 10000;
 }
